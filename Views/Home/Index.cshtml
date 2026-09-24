@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Shop_HW.Models.ProductModel>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Explore our featured products below.</p>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">No products available.</div>
+}
+else
+{
+    <section class="products mt-4">
+        <div class="row">
+            @foreach (var p in Model)
+            {
+                var desc = p.Description ?? string.Empty; var shortDesc = desc.Length > 120 ? desc.Substring(0, 120) + "..." : desc;
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <img src="@(string.IsNullOrEmpty(p.Image) ? Url.Content("~/images/placeholder.png") : Url.Content($"~/images/{p.Image}"))" class="card-img-top" alt="@p.Name" style="object-fit:cover;height:180px;" />
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@p.Name</h5>
+                            <p class="card-text text-muted small">@shortDesc</p>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">@p.Price.ToString("C")</span>
+                                    <a asp-controller="Product" asp-action="ViewProduct" asp-route-id="@p.Id" class="btn btn-sm btn-primary">View</a>
+                                </div>
+                                <div class="mt-2"><span class="badge bg-secondary">@p.Category?.Name</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
