@@ -20,6 +20,11 @@
 			<h2>@Model.Name</h2>
 			<h4 class="text-success">@Model.Price.ToString("C")</h4>
 			<p><strong>Category:</strong> @(Model.Category != null ? Model.Category.Name : "No category")</p>
+			<p><strong>In stock:</strong> @Model.Amount</p>
+			@if (Model.Amount == 0)
+			{
+				<div class="alert alert-danger">This product is out of stock.</div>
+			}
 			<p>@Model.Description</p>
 			<p class="text-muted">Created: @Model.CreateDate.ToString("dd.MM.yyyy")</p>
 

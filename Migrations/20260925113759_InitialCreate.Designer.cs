@@ -12,8 +12,8 @@ using Shop_HW.Data;
 namespace Shop_HW.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260920105813_ProductsAndCategories")]
-    partial class ProductsAndCategories
+    [Migration("20260925113759_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,9 @@ namespace Shop_HW.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("int");
 
                     b.Property<int?>("CategoryId")
                         .HasColumnType("int");

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using Shop_HW.Data;
 
 namespace Shop_HW
@@ -16,6 +17,11 @@ namespace Shop_HW
             // Register AppDbContext
             builder.Services.AddDbContext<Shop_HW.Data.AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDb")));
+
+            // Ensure consistent number formatting (use dot as decimal separator)
+            var defaultCulture = new CultureInfo("en-US");
+            CultureInfo.DefaultThreadCurrentCulture = defaultCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
 
             var app = builder.Build();
 

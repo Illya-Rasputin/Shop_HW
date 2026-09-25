@@ -15,14 +15,21 @@ namespace Shop_HW.Controllers
             _context = context;
         }
 
-        //Home Index - show latest products
-        public IActionResult Index()
+        //Home Index - show products with pagination
+        public IActionResult Index(int page = 1, int pageSize = 12)
         {
+            var total = _context.Products.Count();
+            var totalPages = (int)Math.Ceiling(total / (double)pageSize);
+
             var products = _context.Products
                 .Include(p => p.Category)
                 .OrderByDescending(p => p.CreateDate)
-                .Take(8)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .AsEnumerable();
+
+            ViewBag.Page = page;
+            ViewBag.TotalPages = totalPages;
 
             return View(products);
         }

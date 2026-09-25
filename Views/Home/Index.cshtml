@@ -21,8 +21,29 @@ else
             {
                 var desc = p.Description ?? string.Empty; var shortDesc = desc.Length > 120 ? desc.Substring(0, 120) + "..." : desc;
                 <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <img src="@(string.IsNullOrEmpty(p.Image) ? Url.Content("~/images/placeholder.png") : Url.Content($"~/images/{p.Image}"))" class="card-img-top" alt="@p.Name" style="object-fit:cover;height:180px;" />
+                    <div class="card h-100 shadow-sm @(p.Amount == 0 ? "bg-dark text-white" : "")">
+                        <div class="position-relative">
+                            @{ 
+                                var imgSrc = string.Empty;
+                                if (string.IsNullOrEmpty(p.Image))
+                                {
+                                    imgSrc = Url.Content("~/images/placeholder.png");
+                                }
+                                else if (p.Image.StartsWith("http", System.StringComparison.OrdinalIgnoreCase))
+                                {
+                                    imgSrc = p.Image;
+                                }
+                                else
+                                {
+                                    imgSrc = Url.Content($"~/images/{p.Image}");
+                                }
+                            }
+                            <img src="@imgSrc" class="card-img-top" alt="@p.Name" style="object-fit:cover;height:180px;@(p.Amount == 0 ? "filter:grayscale(60%) brightness(60%);" : "")" />
+                            @if (p.Amount == 0)
+                            {
+                                <span class="badge bg-danger position-absolute" style="top:8px;right:8px;">Out of stock</span>
+                            }
+                        </div>
                         <div class="card-body d-flex flex-column">
                             <h5 class="card-title">@p.Name</h5>
                             <p class="card-text text-muted small">@shortDesc</p>
@@ -39,4 +60,29 @@ else
             }
         </div>
     </section>
+}
+
+@{
+    var page = ViewBag.Page as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+}
+
+@if (totalPages > 1)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center mt-4">
+            <li class="page-item @(page == 1 ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", "Home", new { page = page - 1 })">Previous</a>
+            </li>
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == page ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", "Home", new { page = i })">@i</a>
+                </li>
+            }
+            <li class="page-item @(page == totalPages ? "disabled" : "")">
+                <a class="page-link" href="@Url.Action("Index", "Home", new { page = page + 1 })">Next</a>
+            </li>
+        </ul>
+    </nav>
 }

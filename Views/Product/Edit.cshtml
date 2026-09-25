@@ -1,0 +1,65 @@
+@model Shop_HW.Models.ProductModel
+
+@{
+	ViewData["Title"] = "Edit Product";
+}
+
+<div class="container mt-4">
+	<div class="row">
+		<div class="col-md-8">
+			<h2>Edit product</h2>
+
+			<form asp-action="Edit" method="post">
+				@Html.AntiForgeryToken()
+				<input asp-for="Id" type="hidden" />
+
+				<div class="mb-3">
+					<label asp-for="Name" class="form-label"></label>
+					<input asp-for="Name" class="form-control" />
+					<span asp-validation-for="Name" class="text-danger"></span>
+				</div>
+
+				<div class="mb-3">
+					<label asp-for="Description" class="form-label">Description</label>
+					<textarea asp-for="Description" class="form-control" rows="4"></textarea>
+					<span asp-validation-for="Description" class="text-danger"></span>
+				</div>
+
+				<div class="mb-3">
+					<label asp-for="Price" class="form-label">Price</label>
+					<input asp-for="Price" class="form-control" type="number" step="0.01" />
+					<span asp-validation-for="Price" class="text-danger"></span>
+				</div>
+
+				<div class="mb-3">
+					<label asp-for="Image" class="form-label">Image URL</label>
+					<input asp-for="Image" class="form-control" />
+					<span asp-validation-for="Image" class="text-danger"></span>
+				</div>
+
+				<div class="mb-3">
+					<label asp-for="Amount" class="form-label">Amount in stock</label>
+					<input asp-for="Amount" class="form-control" type="number" min="0" />
+					<span asp-validation-for="Amount" class="text-danger"></span>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Category</label>
+					<select asp-for="CategoryId" class="form-select"
+					        asp-items="@(new SelectList((IEnumerable<Shop_HW.Models.CategoryModel>)ViewBag.Categories, "Id", "Name", Model.CategoryId))">
+						<option value="">-- No category --</option>
+					</select>
+				</div>
+
+				<div class="mb-3">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<a asp-controller="Product" asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

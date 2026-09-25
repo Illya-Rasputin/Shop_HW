@@ -50,6 +50,48 @@ namespace Shop_HW.Controllers
 
             return RedirectToAction("Index");
         }
+
+        // GET: Product/Edit/5
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var product = _context.Products.Find(id);
+            if (product == null)
+                return NotFound();
+
+            var categories = _context.Categories.OrderBy(c => c.Name).ToList();
+            ViewBag.Categories = categories;
+
+            return View(product);
+        }
+
+        // POST: Product/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Models.ProductModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Categories = _context.Categories.OrderBy(c => c.Name).ToList();
+                return View(model);
+            }
+
+            var product = _context.Products.Find(model.Id);
+            if (product == null)
+                return NotFound();
+
+            product.Name = model.Name;
+            product.Description = model.Description;
+            product.Price = model.Price;
+            product.Amount = model.Amount;
+            product.Image = model.Image;
+            product.CategoryId = model.CategoryId;
+
+            _context.SaveChanges();
+
+            
+            return RedirectToAction("Index");
+        }
     }
     
 }
