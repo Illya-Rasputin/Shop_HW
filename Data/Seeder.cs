@@ -1,83 +1,81 @@
-﻿using Shop_HW.Models;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-
+using Shop_HW.Models;
+using System.Text.Json;
 namespace Shop_HW.Data
 {
     public static class Seeder
     {
         // Extension for WebApplication (minimal hosting). Returns the same app to allow chaining.
-        public static WebApplication Seed(this WebApplication app)
+        public async static Task Seed(this WebApplication app)
         {
 
             using var scope = app.Services.CreateScope();
             using var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var environment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
 
 
             dbContext.Database.Migrate();
-            if (!dbContext.Categories.Any())
+
+
+            if (!roleManager.Roles.Any())
             {
-                var categories = new List<CategoryModel>
+                var adminRole = new IdentityRole { Name = "admin" };
+                var userRole = new IdentityRole { Name = "user" };
+                await roleManager.CreateAsync(adminRole);
+                await roleManager.CreateAsync(userRole);
+
+                var admin = new ApplicationUser
                 {
-                    new CategoryModel
-                    {
-                        Name = "Electronics",
-                        Products = new List<ProductModel>
-                        {
-                            new() { Name = "iPhone 15 Pro", Description = "Apple iPhone 15 Pro with A17 Bionic chip, 256GB.", Price = 999.99m, Image = "https://example.com/images/iphone15pro.jpg", Amount = 5 },
-                            new() { Name = "Samsung Galaxy S24", Description = "Samsung Galaxy S24 with powerful camera system.", Price = 899.99m, Image = "https://example.com/images/galaxy_s24.jpg", Amount = 0 },
-                            new() { Name = "MacBook Air 13", Description = "Apple MacBook Air 13 with M2, 8GB RAM, 256GB SSD.", Price = 1199.99m, Image = "https://example.com/images/macbookair13.jpg", Amount = 3 },
-                            new() { Name = "Sony WH-1000XM5", Description = "Noise cancelling wireless headphones.", Price = 349.99m, Image = "https://example.com/images/sony_wh1000xm5.jpg", Amount = 10 },
-                            new() { Name = "Apple iPad Air", Description = "10.9-inch iPad Air with M1 chip.", Price = 599.99m, Image = "https://example.com/images/ipad_air.jpg", Amount = 0 }
-                        }
-                    },
-
-                    new CategoryModel
-                    {
-                        Name = "Literature",
-                        Products = new List<ProductModel>
-                        {
-                            new() { Name = "The Shining (Stephen King)", Description = "A classic horror novel by Stephen King.", Price = 14.99m, Image = "https://example.com/images/the_shining.jpg", Amount = 7 },
-                            new() { Name = "It (Stephen King)", Description = "Horror novel about a shape-shifting entity.", Price = 18.99m, Image = "https://example.com/images/it_stephen_king.jpg", Amount = 0 },
-                            new() { Name = "1984 (George Orwell)", Description = "Dystopian novel by George Orwell.", Price = 12.99m, Image = "https://example.com/images/1984_orwell.jpg", Amount = 12 },
-                            new() { Name = "The Lord of the Rings (J.R.R. Tolkien)", Description = "Epic fantasy trilogy.", Price = 29.99m, Image = "https://example.com/images/lotr.jpg", Amount = 2 },
-                            new() { Name = "Murder on the Orient Express (Agatha Christie)", Description = "Classic mystery novel.", Price = 9.99m, Image = "https://example.com/images/orient_express.jpg", Amount = 4 }
-                        }
-                    },
-
-                    new CategoryModel
-                    {
-                        Name = "Furniture",
-                        Products = new List<ProductModel>
-                        {
-                            new() { Name = "Modern Sofa", Description = "3-seater fabric sofa, grey.", Price = 499.99m, Image = "https://example.com/images/sofa_modern.jpg", Amount = 1 },
-                            new() { Name = "Dining Table", Description = "Solid wood dining table for 6.", Price = 699.99m, Image = "https://example.com/images/dining_table.jpg", Amount = 0 },
-                            new() { Name = "Office Chair Ergonomic", Description = "Adjustable lumbar support, mesh back.", Price = 199.99m, Image = "https://example.com/images/office_chair.jpg", Amount = 6 },
-                            new() { Name = "Queen Bed Frame", Description = "Upholstered bed frame with headboard.", Price = 399.99m, Image = "https://example.com/images/bed_frame.jpg", Amount = 2 },
-                            new() { Name = "Bookshelf 5-tier", Description = "Industrial-style bookshelf.", Price = 149.99m, Image = "https://example.com/images/bookshelf.jpg", Amount = 5 }
-                        }
-                    },
-
-                    new CategoryModel
-                    {
-                        Name = "Clothes & Accessories",
-                        Products = new List<ProductModel>
-                        {
-                            new() { Name = "Classic T-Shirt", Description = "100% cotton, unisex.", Price = 19.99m, Image = "https://example.com/images/tshirt_classic.jpg", Amount = 10 },
-                            new() { Name = "Blue Jeans", Description = "Slim fit denim jeans.", Price = 49.99m, Image = "https://example.com/images/jeans_blue.jpg", Amount = 0 },
-                            new() { Name = "Running Sneakers", Description = "Lightweight running shoes.", Price = 89.99m, Image = "https://example.com/images/sneakers.jpg", Amount = 7 },
-                            new() { Name = "Classic Watch", Description = "Analog watch with leather strap.", Price = 149.99m, Image = "https://example.com/images/watch_classic.jpg", Amount = 3 },
-                            new() { Name = "Leather Backpack", Description = "Everyday leather backpack.", Price = 129.99m, Image = "https://example.com/images/backpack_leather.jpg", Amount = 2 }
-                        }
-                    }
+                    Email = "admin@mail.com",
+                    EmailConfirmed = true,
+                    UserName = "admin",
+                    FirstName = "John",
+                    LastName = "Smith"
                 };
 
-                dbContext.Categories.AddRange(categories);
-                dbContext.SaveChanges();
+                var user = new ApplicationUser
+                {
+                    Email = "user@mail.com",
+                    EmailConfirmed = true,
+                    UserName = "user",
+                    FirstName = "Mike",
+                    LastName = "Thomson"
+                };
+                await userManager.CreateAsync(admin, "qwerty");
+                await userManager.CreateAsync(user, "qwerty");
+
+                await userManager.AddToRoleAsync(admin, "admin");
+                await userManager.AddToRoleAsync(user, "user");
             }
 
-            return app;
+            if (!dbContext.Categories.Any())
+            {
+                string filePath = Path.Combine(environment.WebRootPath, "seed_data", "products_categories.json");
+                if (File.Exists(filePath))
+                {
+                    string json = File.ReadAllText(filePath);
+                    var categories = JsonSerializer.Deserialize<List<CategoryModel>>(json);
+                    if (categories != null)
+                    {
+                        foreach (var category in categories)
+                        {
+                            foreach (var product in category.Products)
+                            {
+                                product.Rating = new Random().Next(1, 6);
+                            }
+                        }
+                    }
+                    dbContext.Categories.AddRange(categories);
+                    dbContext.SaveChanges();
+                }       
+            }
+
+           
         }
     }
 }

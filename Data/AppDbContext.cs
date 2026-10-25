@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Shop_HW.Models;
 using System;
 
 namespace Shop_HW.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions options)
             : base(options)
@@ -33,7 +34,13 @@ namespace Shop_HW.Data
 
                 e.Property(p => p.Price)
                     .HasColumnType("decimal(18, 2)");
-            });
+
+                e.Property(p => p.Rating)
+                    .HasDefaultValue(0.0);
+
+                e.Property(p => p.Amount)
+                    .HasDefaultValue(0);
+        });
 
             // Category
             builder.Entity<CategoryModel>(e =>

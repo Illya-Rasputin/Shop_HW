@@ -83,6 +83,7 @@ namespace Shop_HW.Controllers
             product.Name = model.Name;
             product.Description = model.Description;
             product.Price = model.Price;
+            product.Rating = model.Rating;
             product.Amount = model.Amount;
             product.Image = model.Image;
             product.CategoryId = model.CategoryId;

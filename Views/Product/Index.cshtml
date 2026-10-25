@@ -13,6 +13,7 @@
                     <th>Id</th>
                     <th>Name</th>
                     <th>Price</th>
+                    <th>Rating</th>
                     <th>Amount</th>
                     <th>Category</th>
                     <th>Date</th>
@@ -29,6 +30,7 @@
                             <a asp-controller="Product" asp-action="ViewProduct" asp-route-id="@product.Id">@product.Name</a>
                         </td>
                         <td>@product.Price.ToString("#.##") ₴</td>
+                        <td>@product.Rating</td>
                         <td>@product.Amount</td>
                         <td>@(product.Category != null ? product.Category.Name : "Без категорії")</td>
                         <td>@product.CreateDate.ToString("dd.MM.yyyy")</td>

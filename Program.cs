@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 using Shop_HW.Data;
+using Shop_HW.Services;
+using Shop_HW.Models;
+using System.Globalization;
 
 namespace Shop_HW
 {
@@ -15,9 +19,31 @@ namespace Shop_HW
 
 
             // Register AppDbContext
-            builder.Services.AddDbContext<Shop_HW.Data.AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDb")));
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            {
+                string? connectionString = builder.Configuration.GetConnectionString("LocalDb");
+                options.UseSqlServer(connectionString);
+            });
 
+            
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.User.RequireUniqueEmail = true;
+
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredUniqueChars = 1;
+            })
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders()
+            .AddDefaultUI();
+
+            // Add services
+            builder.Services.AddScoped<IEmailSender, EmailService>();
             // Ensure consistent number formatting (use dot as decimal separator)
             var defaultCulture = new CultureInfo("en-US");
             CultureInfo.DefaultThreadCurrentCulture = defaultCulture;
@@ -36,6 +62,10 @@ namespace Shop_HW
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            app.MapRazorPages();
+
+            
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
@@ -44,8 +74,7 @@ namespace Shop_HW
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
 
-            // Seed database
-            //app.Seed();
+            app.Seed().Wait();
 
             app.Run();
         }
